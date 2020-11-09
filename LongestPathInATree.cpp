@@ -26,7 +26,6 @@ int fy[8] = {0, 0, 1, -1, 1, -1, 1, -1};
 #define SORT(v)  sort(v.begin(), v.end());
 #define RSORT(v) sort(v.begin(), v.end(), greater<>())
 #define CASEP(v) cout<<"Case "<<tc<<": "<<v<<"\n"
-#define DEBUG(v) cout << v << " "; cout << en;
 #define mem(a, b) memset(a, b, sizeof(a))
 #define valid(nx, ny, row, col) nx >= 0 && nx < row && ny >= 0 && ny < col
 
