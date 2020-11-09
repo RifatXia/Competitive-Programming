@@ -77,7 +77,7 @@ int main(void)
 
 	for(int i = 1; i <= nodes; i++)
 	{
-		cout << findParent(i) << " ";
+		cout << parent[i] << " ";
 	}
 
 	return 0;
