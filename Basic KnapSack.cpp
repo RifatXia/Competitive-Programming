@@ -54,7 +54,7 @@ int knapsack(int pos, int cap)
 
 	if(cap >= size[pos])
 	{
-		int take = knapsack(pos + 1, cap - size[pos]) + value[pos];
+		int take = knapsack(pos + 1, cap - size[pos]) + value[pos]; //if we take the current item
 		ans = max(ans, take);
 	}
 
