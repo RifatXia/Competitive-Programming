@@ -89,7 +89,7 @@ int main(void)
 		int st = max(2, a);
 		for(int i = st; i <= b; i++)
 		{
-            //If the number is divisble by any prime number, it is not a prime
+            		//If the number is divisble by any prime number, it is not a prime
 			for(int j = 0; j < pNum.size() && pNum[j] < i; j++)
 			{
 				if(i % pNum[j] == 0)
@@ -100,7 +100,7 @@ int main(void)
 			}
 		}
 
-        //Printing out the answers
+        	//Printing out the answers
 		for(int i = st; i <= b; i++)
 		{
 			if(check[i - a])
