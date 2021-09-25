@@ -1,77 +1,82 @@
-// Basic Segment Tree with queries to find the max in a given range 
+// functions of a segment tree - answer sum queries in log(N) time, update values and sum in log(N) time 
+// Problem - https://vjudge.net/contest/401932#problem/J
 // RifatXia
-
 #include <bits/stdc++.h>
 using namespace std;
 
-double eps = 1e-9;
-double pi = acos(-1);
-
-int fx[8] = {1, -1, 0, 0, 1, -1, -1, 1};
-int fy[8] = {0, 0, 1, -1, 1, -1, 1, -1};
-
-// mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
-
-#define fast_io ios_base::sync_with_stdio(false); cin.tie(0);
-#define ll long long
-#define ull unsigned long long
 #define en "\n"
-#define ff first
-#define ss second
-#define sp(x) fixed << setprecision(x)
-#define VECT(v)  vector<int>v
-#define SCAN(v)  int temp; for(int i=0; i<n; i++) {cin>>temp; v.push_back(temp);}
-#define PRINT(v) for(int i = 0; i < v.size(); i++) cout << v[i] << " "; cout << en;
-#define SORT(v)  sort(v.begin(), v.end());
-#define RSORT(v) sort(v.begin(), v.end(), greater<int>())
-#define CASEP(v) cout<<"Case "<<tc<<": "<<v<<"\n"
-#define DEBUG(v) cout << v << " "; cout << en;
-#define MIN(a, b) a < b ? a : b
-#define MAX(a, b) a > b ? a : b
-#define all(v) v.begin(), v.end()
-#define mem(a, b) memset(a, b, sizeof(a))
-#define valid(nx, ny, row, col) nx >= 0 && nx < row && ny >= 0 && ny < col
-#define pii pair <int, int>
-#define inf int(2e9)
-#define mod int(1e9 + 7)
 
 const int lim = 1e5 + 10;
-int num[lim], seg[4 * lim];
+ll num[lim], seg[4 * lim], lazy[4 * lim];
 
-// funtion to build the segment tree 
-void build(int ind, int low, int high)
+// building the segment tree according to the input
+void build(int i, int low, int high)
 {
-    // the values of the leaf 
     if(low == high)
     {
-        seg[ind] = num[low];
+        seg[i] = num[low];
         return ;
     }
-    
-    int mid = (low + high)/2;
 
-    // proceeding towards the left and the right of the segment tree 
-    build(2 * ind + 1, low, mid);
-    build(2 * ind + 2, mid + 1, high);
-    seg[ind] = max(seg[2 * ind + 1], seg[2 * ind + 2]);
+//     if leaf node is not reached, keep on moving left and right accordingly 
+    int mid = (low + high)/2;
+    build(2 * i + 1, low, mid);
+    build(2 * i + 2, mid + 1, high);
+    
+//     updating the latest value of the sum in the range
+    seg[i] = seg[2 * i + 1] + seg[2 * i + 2];
 }
 
-int query(int ind, int low, int high, int l, int r)
+// updating the values in a range 
+void update(int i, int low, int high, int l, int r, int x)
 {
-    // completely inside the range
-    if(low >= l && high <= r)
-        return seg[ind];
-
-    // completely out of range
+//     completely out of range 
     if(high < l || low > r)
-        return -inf;
+        return ;
 
-    // intersects the range and so, checking on both the left and the right 
+//     completely in the range 
+    if(high <= r && low >= l)
+    {
+        lazy[i] += x;
+        return ;
+    }
+
+//     if any node is not updated, update its child
+    if(lazy[i] != 0)
+    {
+        lazy[2 * i + 1] += lazy[i];
+        lazy[2 * i + 2] += lazy[i];
+        lazy[i] = 0;
+    }
+
+//     if child nodes exist proceed towards left and right accordingly 
     int mid = (low + high)/2;
-    int left = query(2 * ind + 1, low, mid, l, r);
-    int right = query(2 * ind + 2, mid + 1, high, l, r);
+    update(2 * i + 1, low, mid, l, r, x);
+    update(2 * i + 2, mid + 1, high, l, r, x);
+    
+//     update the segment tree with the latest values 
+    seg[i] = seg[2 * i + 1] + lazy[2 * i + 1] * (mid - low + 1) + seg[2 * i + 2] + lazy[2 * i + 2] * (high - mid);
+}
 
-    return max(left, right);
+// calculating the updated summation 
+ll sum(int i, int low, int high, int l, int r)
+{
+//     completely out of range 
+    if(high < l || low > r)
+        return 0;
+
+//     completely in range 
+    if(high <= r && low >= l)
+    {
+        return seg[i] + lazy[i] * (high - low + 1);
+    }
+
+//     proceeding towards the left and the right child as the range intercepts the index of the node
+    int mid = (low + high)/2;
+    ll ans = sum(2 * i + 1, low, mid, l, r) + sum(2 * i + 2, mid + 1, high, l, r);
+    seg[i] = seg[2 * i + 1] + lazy[2 * i + 1] * (mid - low + 1) + seg[2 * i + 2] + lazy[2 * i + 2] * (high - mid);
+
+    return ans;
 }
 
 int main(void)
@@ -81,24 +86,52 @@ int main(void)
         freopen("out.txt", "w", stdout);
     #endif
 
-    fast_io
-
-    int n;
-    cin >> n;
-
-    for(int i = 0; i < n; i++)
+    int t;
+    cin >> t;
+    for(int tc = 1; tc <= t; tc++)
     {
-        cin >> num[i];
-    }
+        int n, q;
+        cin >> n >> q;
 
-    build(0, 0, n - 1);
-    int q;
-    cin >> q;
-    for(int i = 0; i < q; i++)
-    {
-        int l, r;
-        cin >> l >> r;
-        cout << query(0, 0, n - 1, l, r) << en;
+        for(int i = 0; i < n; i++)
+        {
+            cin >> num[i];
+        }
+
+        for(int i = 0; i < 4 * n; i++)
+        {
+            lazy[i] = 0;
+            seg[i] = 0;
+        }
+
+        build(0, 0, n - 1);
+
+        cout << "Case " << tc << ":\n";
+
+        int x, l, r, val;
+        for(int i = 0; i < q; i++)
+        {
+            cin >> x;
+
+            if(x == 1)
+            {
+                cin >> val;
+                ll ans = sum(0, 0, n - 1, val, val);
+                cout << ans << en;
+                
+                update(0, 0, n - 1, val, val, -ans);
+            }
+            else if(x == 2)
+            {
+                cin >> l >> val;
+                update(0, 0, n - 1, l , l, val);
+            }
+            else if(x == 3)
+            {
+                cin >> l >> r;
+                cout << sum(0, 0, n - 1, l, r) << en;
+            }
+        }
     }
 
     return 0;
