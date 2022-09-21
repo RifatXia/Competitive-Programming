@@ -70,6 +70,21 @@ void RifatXia()
     #endif
 }
 
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+using namespace __gnu_pbds;
+
+typedef tree<
+    int, // the data type
+    null_type, // null_type for the set
+    less<int>, // the comparator. less_equal : ascending multimap, greater : descending
+    rb_tree_tag, // the tree structure would be red black tree
+    tree_order_statistics_node_update
+
+    // find_by_order(index) : finds the element using the index
+    // order_of_key(value) : finds the number of elements less than the value 
+> ordered_set;
+
 #define fast_io ios_base::sync_with_stdio(false); cin.tie(0);
 #define ll long long
 #define ull unsigned long long
